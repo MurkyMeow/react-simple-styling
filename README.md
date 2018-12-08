@@ -143,7 +143,7 @@ With this approach you can't use arrow functions since they don't support "argum
 
 Don't worry about coding experience when using string literals. With some magic of extensions you can bring CSS syntax highlighting and popus into your js.
 
-For VSCode i use this ones:
+For VSCode i prefer this ones:
 
 https://marketplace.visualstudio.com/items?itemName=AndrewRazumovsky.vscode-styled-jsx-languageserver
 
