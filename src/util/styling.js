@@ -29,3 +29,12 @@ export const styled = prefix => component => props => {
   //it needs to be copied =(
   return {...vnode, props: { ...vnode.props, className }}
 }
+
+
+/* For more robust approach */
+
+//grabs className from props and injects it into class list
+export function useClasses([{className}], ...classes) {
+  classes.push(className);
+  return classes.filter(x => !!x).join(' ');
+}
