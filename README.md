@@ -98,6 +98,47 @@ The principle is very much the same as injecting prefix. You can see how exactly
 I was mostly inspired by Vue.js where you write classes like in normal html, without curly braces and additional prefixes. Also, you don't need to create separate files for the CSS (it's getting really anoying to navigate through them) and you don't need to manually apply className from props with stupid concatenations.
 Unfortunately, i haven't found any solution for that. "CSS Modules" forces you to write everything in separate files, "CSS in JS" makes your code look ugly and provides doubt reusability -- thats why i've created my own solution which is satisfying all my demands.
 
+## Robust approach
+
+To be more explicit about grabbing className from props and injecting prefix i have a bit different implementation. It is based on "useClasses" function.
+
+```js
+export default function Card({children}) {
+  const classes = useClasses(arguments, 'card-bg rounded p-2');
+  return (
+    <div className={classes}>
+      {children}
+    </div>
+  );
+}
+```
+
+It takes "arguments" (it's js keyword) as the first parameter so the function can extract className from props and return it. Besides, you can provide the rest of root node's classes to avoid concatenation.
+
+Prefix also needs to be passed in if there's one. Children's classes stay as usual.
+```js
+const prefix = css`
+  .card {
+    width: 300px;
+    margin: 0 auto;
+    text-align: center;
+  }
+`;
+
+export default function App() {
+  const classes = useClasses(arguments, prefix);
+  return (
+    <div className={classes}>
+      <Card className="card">
+        Hello world!
+      </Card>
+    </div>
+  );
+}
+```
+
+With this approach you can't use arrow functions since they're doesn't support "arguments" keyword, but it makes the code easier to read and fits nicely with React Hooks update.
+
 ## CSS syntax highlighting
 
 Don't worry about coding experience when using string literals. With some magic of extensions you can bring CSS syntax highlighting and popus into your js.
