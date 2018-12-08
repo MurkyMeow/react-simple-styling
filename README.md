@@ -12,7 +12,7 @@ const prefix = css`
 ;
 ```
 
-Write normal class names.
+Use normal class names.
 ```js
 const App = ()=> (
   <div>
@@ -23,7 +23,7 @@ const App = ()=> (
 );
 ```
 
-"styled" wrapper will apply the styles and add scoping to it!
+"styled" wrapper will apply the styles and add scoping to them!
 
 ```js
 export default styled(prefix)(App);
@@ -145,6 +145,7 @@ Don't worry about coding experience when using string literals. With some magic 
 
 For VSCode i use this ones:
 https://marketplace.visualstudio.com/items?itemName=AndrewRazumovsky.vscode-styled-jsx-languageserver
+
 https://marketplace.visualstudio.com/items?itemName=blanu.vscode-styled-jsx
 
 ![](https://i.imgur.com/uXkBJM0.png)
