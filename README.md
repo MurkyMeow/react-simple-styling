@@ -31,7 +31,7 @@ export default styled(prefix)(App);
 
 ## How does it work?
 
-Exremely simple! "css" function generates the unique string which is applied to all selectors of the style so this:
+The core concept is extremely simple. "css" function generates the unique string which is applied to all the selectors of the style so this:
 ```css
 .message {
   width: 300px;
@@ -53,7 +53,7 @@ It makes "message" class only available for those elements which parent has "kzs
 
 ## Consuming className
 
-Wanna pass some class names to the component from it's parent?
+Want to pass some class names to the component from it's parent?
 No more extracting and applying className manually!
 
 ```js
@@ -69,7 +69,7 @@ styled wrapper will take care of it!
 export default styled()(Card);
 ```
 
-So the code below
+And the code below
 
 ```js
 const App = ()=> (
@@ -91,7 +91,7 @@ will be transformed into this:
 </div>
 ```
 
-The principle is very much the same as injecting prefix. You can see how exactly this implemented inside **src/utils/styling.js**.
+The principle is very much the same as one that used for injecting prefix. You can see how exactly this implemented inside **src/utils/styling.js**.
 
 ## Why
 
@@ -137,13 +137,14 @@ export default function App() {
 }
 ```
 
-With this approach you can't use arrow functions since they're doesn't support "arguments" keyword, but it makes the code easier to read and fits nicely with React Hooks update.
+With this approach you can't use arrow functions since they don't support "arguments" keyword, but it makes the code easier to read and fits nicely with React Hooks update.
 
 ## CSS syntax highlighting
 
 Don't worry about coding experience when using string literals. With some magic of extensions you can bring CSS syntax highlighting and popus into your js.
 
 For VSCode i use this ones:
+
 https://marketplace.visualstudio.com/items?itemName=AndrewRazumovsky.vscode-styled-jsx-languageserver
 
 https://marketplace.visualstudio.com/items?itemName=blanu.vscode-styled-jsx
