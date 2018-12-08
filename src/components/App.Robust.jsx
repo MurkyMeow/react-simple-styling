@@ -12,10 +12,10 @@ const prefix = css`
 `;
 
 export default function App() {
-  const classes = useClasses(arguments, 'card', prefix);
+  const classes = useClasses(arguments, prefix);
   return (
-    <div>
-      <Card className={classes}>
+    <div className={classes}>
+      <Card className="card">
         Hello world!
       </Card>
     </div>
