@@ -1,0 +1,16 @@
+:root {
+  --card-bg: #362b79;
+  --card-bg-dark: #27206d;
+}
+
+body {
+  color: white;
+  padding: 50px;
+}
+
+.card-bg {
+  background: var(--card-bg);
+}
+.card-bg-dark {
+  background: var(--card-bg-dark);
+}
