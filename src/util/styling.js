@@ -1,26 +1,26 @@
 import scope from 'scope-css';
 import cx from 'classnames';
 
+/**
+ * Adds scoping to specified css and inserts it into the DOM
+ * with <style> tag
+ * @param {String} style - normal css string
+ * @returns {String} scope. Add it to the root node's classList to make style works
+ */
 export const css = style => {
-  //generate random string like "onixdtkg" or "ygcpqlrfo"
-  //(don't pay much attention on it, it's just placeholder algorithm
-  //and needs to be replaced with something more reliable)
   const prefix = Math.random().toString(36).substr(2).match(/[a-zA-Z]+/g).join('');
 
-  //add this string to all selectors of specified css
-  //and insert it into the DOM
   const styleNode = document.createElement('style');
   styleNode.innerHTML = scope(style, '.' + prefix);
   document.head.appendChild(styleNode);
 
-  //prefix is returned to be added into classList
-  //of root node of a component
   return prefix;
 }
 
-//wrapper for our components which allows them
-//to consume className from props and injects prefix
-//automatically (>^_^)>
+/**
+ * Wraps React component to allow it consume className from props automatically
+ * @param {String} prefix - additional className that will be injected into root node of the component. Usually you get it from "css" function
+ */
 export const styled = prefix => component => props => {
   const vnode = component(props);
   const className = cx(prefix, vnode.props.className, props.className);
@@ -33,8 +33,8 @@ export const styled = prefix => component => props => {
 
 /* For more robust approach */
 
-//grabs className from props and injects it into class list
-export function useClasses([{className}], ...classes) {
-  classes.push(className);
-  return cx(classes);
-}
+//the first parameter is an array of caller's arguments
+//components usually take only 1 argument which is props
+//so we destruct the first element from this array
+//and then just concatenate className from it with the rest of provided classes
+export const useClasses = ([props], ...classes)=> cx(props.className, classes);

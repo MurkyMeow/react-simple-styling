@@ -1,7 +1,7 @@
 import React from 'react';
 import { styled } from '../util/styling.js';
 
-//Wanna pass className to the component from it's parent?
+//Want to pass className to the component from it's parent?
 
 //no more extracting and applying className manually!
 const Card = ({children})=> (
