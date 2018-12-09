@@ -8,6 +8,8 @@ import cx from 'classnames';
  * @returns {String} scope. Add it to the root node's classList to make style works
  */
 export const css = style => {
+  //don't pay much attention on it, it's placeholder algorithm
+  //and needs to be replaced with something more reliable
   const prefix = Math.random().toString(36).substr(2).match(/[a-zA-Z]+/g).join('');
 
   const styleNode = document.createElement('style');
