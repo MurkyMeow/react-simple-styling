@@ -25,8 +25,8 @@ export const styled = prefix => component => props => {
   const vnode = component(props);
   const className = cx(prefix, vnode.props.className, props.className);
 
-  //vnode is immutable so in order to be modified
-  //it needs to be copied =(
+  //vnode is immutable so in order to modify it
+  //you must make a copy =(
   return {...vnode, props: { ...vnode.props, className }}
 }
 
@@ -36,5 +36,5 @@ export const styled = prefix => component => props => {
 //grabs className from props and injects it into class list
 export function useClasses([{className}], ...classes) {
   classes.push(className);
-  return classes.filter(x => !!x).join(' ');
+  return cx(classes);
 }
