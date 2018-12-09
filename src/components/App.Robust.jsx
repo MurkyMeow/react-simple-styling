@@ -1,7 +1,7 @@
 import React from 'react';
 import { css, useClasses } from '../util/styling';
 
-import Card from './Card';
+import Card from './Card.Robust';
 
 const prefix = css`
   .card {
