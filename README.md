@@ -66,7 +66,7 @@ const Card = ({children})=> (
 
 styled wrapper will take care of it!
 ```js
-export default styled()(Card);
+export default styleable(Card);
 ```
 
 And the code below
