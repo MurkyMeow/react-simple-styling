@@ -62,9 +62,9 @@ No more extracting and applying className manually!
 
 ```js
 const Card = ({children})=> (
-    <div className="card-bg rounded p-2">
-        {children}
-    </div>
+  <div className="card-bg rounded p-2">
+    {children}
+  </div>
 );
 ```
 
