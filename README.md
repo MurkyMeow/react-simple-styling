@@ -1,5 +1,9 @@
 # React simple styling
 
+```console
+npm i react-simple-styling
+```
+
 Write normal CSS.
 
 ```js
@@ -150,9 +154,3 @@ https://marketplace.visualstudio.com/items?itemName=AndrewRazumovsky.vscode-styl
 https://marketplace.visualstudio.com/items?itemName=blanu.vscode-styled-jsx
 
 ![](https://i.imgur.com/uXkBJM0.png)
-
-## Try it out!
-
-```console
-git clone https://github.com/MurkyMeow/react-simple-styling.git
-```

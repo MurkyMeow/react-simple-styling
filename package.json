@@ -1,27 +1,12 @@
 {
-  "name": "test",
-  "version": "0.1.0",
-  "private": true,
+  "name": "react-simple-styling",
+  "version": "0.1.2",
+  "main": "./src/styling.js",
+  "repository": {
+    "url": "https://github.com/MurkyMeow/react-simple-styling"
+  },
   "dependencies": {
     "classnames": "^2.2.6",
-    "react": "16.7.0-alpha.2",
-    "react-dom": "16.7.0-alpha.2",
-    "react-scripts": "2.1.1",
     "scope-css": "^1.2.1"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  }
 }
