@@ -1,36 +1,49 @@
 import scope from 'scope-css';
 import cx from 'classnames';
-import injectProps from './injectProps';
+import nanoid from 'nanoid';
 
 /**
  * Adds scoping to specified css and inserts it into the DOM with <style> tag
  * @param {String} style - normal css string
- * @returns {String} scope. Add it to the root node's classList to make style works
+ * @returns {String} scope class, it should be applied to the root node of a component
  */
 export const css = style => {
-  //needs to be replaced with something more reliable =)
-  const prefix = Math.random().toString(36).substr(2).match(/[a-zA-Z]+/g).join('');
+  //generate random string for scoping
+  const prefix = 's_' + nanoid(7);
 
   const styleNode = document.createElement('style');
-  styleNode.innerHTML = scope(style, '.' + prefix);
+  styleNode.innerHTML = scope(style, `.${prefix}, .${prefix}`);
   document.head.appendChild(styleNode);
 
   return prefix;
 };
 
-/** 
- * Wraps React component to inject "prefix" into the classList of it 
- * usually you get prefix from "css" function
-*/
-export const styled = prefix => component =>
-  injectProps(attributes => ({
-    className: cx(attributes.className, prefix)
-  }))(component);
+/**
+ * Wraps react component to apply classname every time it renders
+ * @param {*} component
+ * @param {*} classname
+ * @param {*} child - used internally to stop recursion when working with Fragment
+ */
+export const styled = (component, classname, child = false) => props => {
+  const vnode = child ? component : component(props);
+  const className = cx(vnode.props.className, classname);
+  let children = vnode.props.children;
 
+  if (!child && children instanceof Array) {
+    children = children.map(child => styled(child, classname, true)());
+  }
 
-/** Wraps React component to allow it consume className from props automatically */
-export const styleable = component => props =>
-  styled(props.className)(component)(props);
+  return { ...vnode, props: { ...vnode.props, className, children } };
+}
+
+/**
+ * Wraps react component to apply classname from props automatically
+ * @param {*} component - component to wrap
+ */
+export const styleable = component => props => styled(
+  component,
+  props && props.className
+)();
 
 /* For more robust approach */
 

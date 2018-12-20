@@ -1,19 +1,29 @@
 # React simple styling
 
+Very simple Vue-like library to create scoped styles for your React components!
+
 ```console
 npm i react-simple-styling
+```
+
+## Usage
+
+import
+
+```js
+import { styleable, styled, css } from 'react-simple-styling'
 ```
 
 Write normal CSS.
 
 ```js
-const prefix = css`
+const scope = css`
   .message {
     width: 300px;
     margin: 0 auto;
     color: red;
   }
-;
+;`
 ```
 
 Use normal class names.
@@ -27,15 +37,15 @@ const App = ()=> (
 );
 ```
 
-"styled" wrapper will apply the styles and add scoping to them!
+**styled** wrapper will apply the styles and add scoping to them!
 
 ```js
-export default styled(prefix)(App);
+export default styled(App, scope);
 ```
 
-## How does it work?
+<!-- ## How does it work?
 
-The core concept is extremely simple. "css" function generates the unique string which is applied to all the selectors of the style so this:
+The core concept is extremely simple. **css** function generates the unique string which is applied to all the selectors of the style so this:
 ```css
 .message {
   width: 300px;
@@ -46,6 +56,7 @@ The core concept is extremely simple. "css" function generates the unique string
 
 becomes something like this:
 ```css
+.kzsbuayyd,
 .kzsbuayyd .message {
   width: 300px;
   margin: 0 auto;
@@ -53,8 +64,8 @@ becomes something like this:
 }
 ```
 
-It makes "message" class only available for those elements which parent has "kzsbuayyd" class. So the final step is to inject "kzsbuayyd" into the classList of root node of current component every time it renders and boom -- style is applied and isolated from other component's styles. Unfortunately it doesn't work for global ones so keep it in mind.
-
+It makes "message" class only available for those elements which parent has "kzsbuayyd" class and for the parent itself. So the final step is to inject "kzsbuayyd" into the classList of root node of current component whish is what **styled** function is doing and boom -- style is applied and isolated from other component's styles. Unfortunately it doesn't work for global ones so keep it in mind.
+ -->
 ## Consuming className
 
 Want to pass some class names to the component from it's parent?
@@ -68,7 +79,7 @@ const Card = ({children})=> (
 );
 ```
 
-styled wrapper will take care of it!
+**styleable** wrapper will take care of it!
 ```js
 export default styleable(Card);
 ```
@@ -95,16 +106,58 @@ will be transformed into this:
 </div>
 ```
 
-The principle is very much the same as one that used for injecting prefix. You can see how exactly this implemented inside **src/utils/styling.js**.
+## :host
 
-## Why
+There's a cool trick to style your component's root element. For example, you can use **:host** pseudo class just like in Shadow DOM:
 
-I was mostly inspired by Vue.js where you write classes like in normal html, without curly braces and additional prefixes. Also, you don't need to create separate files for the CSS (it's getting really anoying to navigate through them) and you don't need to manually apply className from props with stupid concatenations.
-Unfortunately, i haven't found any solution for that. "CSS Modules" forces you to write everything in separate files, "CSS in JS" makes your code look ugly and provides doubt reusability -- thats why i've created my own solution which is satisfying all my demands.
+```js
+const scope = css`
+  :host {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+  }
+`;
+
+const BottomNavigation = ()=> (
+  <Flex justify="around">
+    <LinkButton to="/calendar"/>
+    <LinkButton to="/explore"/>
+    <LinkButton to="/notifications"/>
+    <LinkButton to="/profile"/>
+  </Flex>
+);
+
+export default styled(BottomNavigation, scope);
+```
+
+## What about Fragment?
+
+Fragment component's children doesn't have parent so scope is applied to all of them:
+
+```js
+const scope = css`
+  .test {
+    color: red;
+  }
+`;
+
+const Foo = styled(()=> (
+  <>
+    <p>bar</p>
+    <p>baz</p>
+  </>
+), scope);
+
+//<Foo/> will be rendered this way:
+
+<p class="test">bar</p>
+<p class="test">baz</p>
+```
 
 ## Robust approach
 
-To be more explicit about grabbing className from props and injecting prefix i have a bit different implementation. It is based on "useClasses" function.
+To be more explicit about grabbing className from props and injecting scope i have a bit different implementation. It is based on **useClasses** function.
 
 ```js
 export default function Card({children}) {
@@ -117,11 +170,13 @@ export default function Card({children}) {
 }
 ```
 
-It takes "arguments" (it's js keyword) as the first parameter so the function can extract className from props and return it. Besides, you can provide the rest of root node's classes to avoid concatenation.
+It takes *arguments* keyword as the first parameter so the function can extract className from props and return it. Besides, you can provide the rest of root node's classes to avoid concatenation.
 
-Prefix also needs to be passed in if there's one. Children's classes stay as usual.
+[classnames]: https://www.npmjs.com/package/classnames
+
+Scope also needs to be passed in if there's one. Children's classes stay as usual.
 ```js
-const prefix = css`
+const scope = css`
   .card {
     width: 300px;
     margin: 0 auto;
@@ -130,7 +185,7 @@ const prefix = css`
 `;
 
 export default function App() {
-  const classes = useClasses(arguments, prefix);
+  const classes = useClasses(arguments, scope);
   return (
     <div className={classes}>
       <Card className="card">
@@ -141,7 +196,13 @@ export default function App() {
 }
 ```
 
-With this approach you can't use arrow functions since they don't support "arguments" keyword, but it makes the code easier to read and fits nicely with React Hooks update.
+It relies on [classnames] so arrays and conditionals are supported =).
+
+```js
+const classes = useClasses(arguments, 'foo', ['bar'], { baz: true })
+```
+
+With this approach you can't use arrow functions since they don't support *arguments* keyword, but it makes the code easier to read and fits nicely with React Hooks update.
 
 ## CSS syntax highlighting
 
@@ -153,4 +214,4 @@ https://marketplace.visualstudio.com/items?itemName=AndrewRazumovsky.vscode-styl
 
 https://marketplace.visualstudio.com/items?itemName=blanu.vscode-styled-jsx
 
-![](https://i.imgur.com/uXkBJM0.png)
+![](https://i.imgur.com/vMFU4sJ.png)
