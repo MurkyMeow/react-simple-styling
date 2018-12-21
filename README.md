@@ -43,29 +43,6 @@ const App = ()=> (
 export default styled(App, scope);
 ```
 
-<!-- ## How does it work?
-
-The core concept is extremely simple. **css** function generates the unique string which is applied to all the selectors of the style so this:
-```css
-.message {
-  width: 300px;
-  margin: 0 auto;
-  color: red;
-}
-```
-
-becomes something like this:
-```css
-.kzsbuayyd,
-.kzsbuayyd .message {
-  width: 300px;
-  margin: 0 auto;
-  color: red;
-}
-```
-
-It makes "message" class only available for those elements which parent has "kzsbuayyd" class and for the parent itself. So the final step is to inject "kzsbuayyd" into the classList of root node of current component whish is what **styled** function is doing and boom -- style is applied and isolated from other component's styles. Unfortunately it doesn't work for global ones so keep it in mind.
- -->
 ## Consuming className
 
 Want to pass some class names to the component from it's parent?
@@ -108,7 +85,7 @@ will be transformed into this:
 
 ## :host
 
-There's a cool trick to style your component's root element. For example, you can use **:host** pseudo class just like in Shadow DOM:
+To style your component's root element you can use **:host** pseudo class just like in Shadow DOM:
 
 ```js
 const scope = css`
@@ -120,7 +97,7 @@ const scope = css`
 `;
 
 const BottomNavigation = ()=> (
-  <Flex justify="around">
+  <Flex justify="around"> {/*<-- style is applied to this element*/}
     <LinkButton to="/calendar"/>
     <LinkButton to="/explore"/>
     <LinkButton to="/notifications"/>
@@ -144,65 +121,20 @@ const scope = css`
 
 const Foo = styled(()=> (
   <>
-    <p>bar</p>
+    <p className="test">bar</p>
     <p>baz</p>
+    <>
+      <p>qux</p>
+    </>
   </>
 ), scope);
 
-//<Foo/> will be rendered this way:
+//<Foo/> will be rendered as shown below:
 
-<p class="test">bar</p>
-<p class="test">baz</p>
+<p class="-vg6oqh test">bar</p>
+<p class="-vg6oqh">baz</p>
+<p class="-vg6oqh">qux</p>
 ```
-
-## Robust approach
-
-To be more explicit about grabbing className from props and injecting scope i have a bit different implementation. It is based on **useClasses** function.
-
-```js
-export default function Card({children}) {
-  const classes = useClasses(arguments, 'card-bg rounded p-2');
-  return (
-    <div className={classes}>
-      {children}
-    </div>
-  );
-}
-```
-
-It takes *arguments* keyword as the first parameter so the function can extract className from props and return it. Besides, you can provide the rest of root node's classes to avoid concatenation.
-
-[classnames]: https://www.npmjs.com/package/classnames
-
-Scope also needs to be passed in if there's one. Children's classes stay as usual.
-```js
-const scope = css`
-  .card {
-    width: 300px;
-    margin: 0 auto;
-    text-align: center;
-  }
-`;
-
-export default function App() {
-  const classes = useClasses(arguments, scope);
-  return (
-    <div className={classes}>
-      <Card className="card">
-        Hello world!
-      </Card>
-    </div>
-  );
-}
-```
-
-It relies on [classnames] so arrays and conditionals are supported =).
-
-```js
-const classes = useClasses(arguments, 'foo', ['bar'], { baz: true })
-```
-
-With this approach you can't use arrow functions since they don't support *arguments* keyword, but it makes the code easier to read and fits nicely with React Hooks update.
 
 ## CSS syntax highlighting
 
