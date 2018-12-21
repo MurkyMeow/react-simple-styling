@@ -8,47 +8,52 @@ import nanoid from 'nanoid';
  * @returns {String} scope class, it should be applied to the root node of a component
  */
 export const css = style => {
-  //generate random string for scoping
-  const prefix = 's_' + nanoid(7);
-
   const styleNode = document.createElement('style');
-  styleNode.innerHTML = scope(style, `.${prefix}, .${prefix}`);
-  document.head.appendChild(styleNode);
 
+  //dash is added to avoid prefixes that start with a digit (which are not valid css classes)
+  const prefix = '-' + nanoid(6);
+  let scopedstyle = scope(style, `.${prefix}`);
+
+  scopedstyle = scopedstyle.replace(new RegExp(`.${prefix}(\\s*).\\S*`, 'gm'), match => {
+    const [scope, selector] = match.split(' ').filter(x => !!x);
+    return `${scope} ${selector}, ${scope}${selector}`;
+  });
+
+  styleNode.innerHTML = scopedstyle;
+  document.head.appendChild(styleNode);
   return prefix;
 };
 
 /**
- * Wraps react component to apply classname every time it renders
- * @param {*} component
- * @param {*} classname
- * @param {*} child - used internally to stop recursion when working with Fragment
+ * Wraps react component to apply classname from props automatically
+ * @param {*} component - component to wrap
+ * @param {*} child - used to stop recursive styling of React.Fragment children
  */
-export const styled = (component, classname, child = false) => props => {
-  const vnode = child ? component : component(props);
-  const className = cx(vnode.props.className, classname);
+export const styleable = (component) => (props) => {
+  const vnode = component instanceof Function ? component(props) : component;
+  const className = cx(vnode.props.className, props.className) || null;
   let children = vnode.props.children;
 
-  if (!child && children instanceof Array) {
-    children = children.map(child => styled(child, classname, true)());
+  //if the component's root node is fragment we need to style
+  //its children individually
+  if (children && vnode.type.toString() === 'Symbol(react.fragment)') {
+    children = children instanceof Array ?
+      children.map(child => styled(child, props.className)()) :
+      children = styled(children, props.className)();
   }
 
   return { ...vnode, props: { ...vnode.props, className, children } };
-}
+};
 
 /**
- * Wraps react component to apply classname from props automatically
- * @param {*} component - component to wrap
+ * Wraps react component to apply class name every time it renders
+ * @param {*} component
+ * @param {*} className
  */
-export const styleable = component => props => styled(
-  component,
-  props && props.className
-)();
-
-/* For more robust approach */
-
-//the first parameter is an array of caller's arguments
-//components usually take only 1 argument which is props
-//so we destruct the first element from this array
-//and then just concatenate className from it with the rest of provided classes
-export const useClasses = ([props], ...classes)=> cx(props.className, classes);
+export const styled = (component, className) => {
+  const styleableComponent = styleable(component);
+  return (props) => {
+    const newprops = { ...props, className };
+    return styleableComponent(newprops);
+  };
+};
