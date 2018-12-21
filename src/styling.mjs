@@ -10,8 +10,8 @@ import nanoid from 'nanoid';
 export const css = style => {
   const styleNode = document.createElement('style');
 
-  //dash is added to avoid prefixes that start with a digit (which are not valid css classes)
-  const prefix = '-' + nanoid(6);
+  //the letter is added to avoid prefixes that start with a digit (which are not valid css classes)
+  const prefix = 's' + nanoid(6);
   let scopedstyle = scope(style, `.${prefix}`);
 
   scopedstyle = scopedstyle.replace(new RegExp(`.${prefix}(\\s*).\\S*`, 'gm'), match => {
