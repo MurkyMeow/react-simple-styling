@@ -14,10 +14,14 @@ export const css = style => {
   const prefix = 's' + nanoid(6);
   let scopedstyle = scope(style, `.${prefix}`);
 
-  scopedstyle = scopedstyle.replace(new RegExp(`.${prefix}(\\s*).\\S*`, 'gm'), match => {
-    const [scope, selector] = match.split(' ').filter(x => !!x);
-    return `${scope} ${selector}, ${scope}${selector}`;
-  });
+  /*
+    transforms the css this way:
+    .scope .class {} --> .scope .class, .class.scope {}
+    to make all the classes accessible in the root element and fragments
+  */
+  scopedstyle = scopedstyle
+    .replace(/\s+/g, ' ')
+    .replace(new RegExp(`(\\.${prefix}) ([^,\\s]*)`, 'g'), '$1 $2, $2$1');
 
   styleNode.innerHTML = scopedstyle;
   document.head.appendChild(styleNode);
@@ -39,7 +43,7 @@ export const styleable = (component) => (props) => {
   if (children && vnode.type.toString() === 'Symbol(react.fragment)') {
     children = children instanceof Array ?
       children.map(child => styled(child, props.className)()) :
-      children = styled(children, props.className)();
+      styled(children, props.className)();
   }
 
   return { ...vnode, props: { ...vnode.props, className, children } };

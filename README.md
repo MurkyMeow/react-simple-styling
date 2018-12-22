@@ -110,7 +110,7 @@ export default styled(BottomNavigation, scope);
 
 ## What about Fragment?
 
-Fragment component's children doesn't have parent so scope is applied to all of them:
+Fragment's children doesn't have parent so scope is applied to all of them:
 
 ```js
 const scope = css`
@@ -129,11 +129,11 @@ const Foo = styled(()=> (
   </>
 ), scope);
 
-//<Foo/> will be rendered as shown below:
+//<Foo/> will be rendered this way:
 
-<p class="-vg6oqh test">bar</p>
-<p class="-vg6oqh">baz</p>
-<p class="-vg6oqh">qux</p>
+<p class="svg6oqh test">bar</p>
+<p class="svg6oqh">baz</p>
+<p class="svg6oqh">qux</p>
 ```
 
 ## CSS syntax highlighting
