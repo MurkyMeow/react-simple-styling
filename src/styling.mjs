@@ -1,4 +1,4 @@
-import scope from 'scope-css';
+import precss from 'precss';
 import cx from 'classnames';
 import nanoid from 'nanoid';
 
@@ -12,19 +12,26 @@ export const css = style => {
 
   //the letter is added to avoid prefixes that start with a digit (which are not valid css classes)
   const prefix = 's' + nanoid(6);
-  let scopedstyle = scope(style, `.${prefix}`);
+
+  precss.process(`
+    .${prefix} {
+      ${style}
+    }
+  `).then(({css})=> {
+    console.log(css);
+    styleNode.innerHTML = css;
+    document.head.appendChild(styleNode);
+  });
 
   /*
     transforms the css this way:
     .scope .class {} --> .scope .class, .class.scope {}
     to make all the classes accessible in the root element and fragments
   */
-  scopedstyle = scopedstyle
+  /* scopedstyle = scopedstyle
     .replace(/\s+/g, ' ')
-    .replace(new RegExp(`(\\.${prefix}) ([^,\\s]*)`, 'g'), '$1 $2, $2$1');
+    .replace(new RegExp(`(\\.${prefix}) ([^,\\s]*)`, 'g'), '$1 $2, $2$1'); */
 
-  styleNode.innerHTML = scopedstyle;
-  document.head.appendChild(styleNode);
   return prefix;
 };
 

@@ -1,6 +1,6 @@
 {
   "name": "react-simple-styling",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "main": "./src/styling",
   "repository": {
     "url": "https://github.com/MurkyMeow/react-simple-styling"
@@ -8,9 +8,10 @@
   "dependencies": {
     "classnames": "^2.2.6",
     "nanoid": "^2.0.0",
-    "scope-css": "^1.2.1"
+    "precss": "^4.0.0"
   },
   "scripts": {
     "start": "react-scripts start"
-  }
+  },
+  "license": "MIT"
 }
