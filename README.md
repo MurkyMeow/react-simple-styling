@@ -1,9 +1,15 @@
 # React simple styling
 
-Very simple Vue-like library to create scoped styles for your React components!
+Simple Vue-like library to create scoped styles for your React components!
 
-```console
+## Installation
+
+```sh
 npm i react-simple-styling
+```
+or
+```sh
+yarn add react-simple-styling
 ```
 
 ## Usage
@@ -11,13 +17,13 @@ npm i react-simple-styling
 import
 
 ```js
-import { styleable, styled, css } from 'react-simple-styling'
+import { css, styleable } from 'react-simple-styling'
 ```
 
-Write normal CSS.
+Get a style wrapper
 
 ```js
-const scope = css`
+const style = css`
   .message {
     width: 300px;
     margin: 0 auto;
@@ -26,9 +32,10 @@ const scope = css`
 ;`
 ```
 
-Use normal class names.
+and apply the css with it
+
 ```js
-const App = ()=> (
+const App = ()=> style(
   <div>
     <div className="message">
       Hello world!
@@ -37,16 +44,9 @@ const App = ()=> (
 );
 ```
 
-**styled** wrapper will apply the styles and add scoping to them!
-
-```js
-export default styled(App, scope);
-```
-
 ## Consuming className
 
-Want to pass some class names to the component from it's parent?
-No more extracting and applying className manually!
+No more manual extracting and applying className from props! **styleable** wrapper allows a component to consume className automatically:
 
 ```js
 const Card = ({children})=> (
@@ -54,10 +54,7 @@ const Card = ({children})=> (
     {children}
   </div>
 );
-```
 
-**styleable** wrapper will take care of it!
-```js
 export default styleable(Card);
 ```
 
@@ -88,7 +85,7 @@ will be transformed into this:
 To style your component's root element you can use **:host** pseudo class just like in Shadow DOM:
 
 ```js
-const scope = css`
+const style = css`
   :host {
     position: fixed;
     bottom: 0;
@@ -96,7 +93,7 @@ const scope = css`
   }
 `;
 
-const BottomNavigation = ()=> (
+const BottomNavigation = ()=> style(
   <Flex justify="around"> {/*<-- style is applied to this element*/}
     <LinkButton to="/calendar"/>
     <LinkButton to="/explore"/>
@@ -104,22 +101,20 @@ const BottomNavigation = ()=> (
     <LinkButton to="/profile"/>
   </Flex>
 );
-
-export default styled(BottomNavigation, scope);
 ```
 
 ## What about Fragment?
 
-Fragment's children doesn't have parent so scope is applied to all of them:
+The elements of a fragment doesn't have parent so scope is applied to all of them:
 
 ```js
-const scope = css`
+const style = css`
   .test {
     color: red;
   }
 `;
 
-const Foo = styled(()=> (
+const Foo = ()=> style(
   <>
     <p className="test">bar</p>
     <p>baz</p>
@@ -127,9 +122,9 @@ const Foo = styled(()=> (
       <p>qux</p>
     </>
   </>
-), scope);
+);
 
-//<Foo/> will be rendered this way:
+//<Foo/> will be rendered as shown below
 
 <p class="svg6oqh test">bar</p>
 <p class="svg6oqh">baz</p>
@@ -146,4 +141,11 @@ https://marketplace.visualstudio.com/items?itemName=AndrewRazumovsky.vscode-styl
 
 https://marketplace.visualstudio.com/items?itemName=blanu.vscode-styled-jsx
 
-![](https://i.imgur.com/vMFU4sJ.png)
+![](https://i.imgur.com/2Cmow8E.png)
+
+## Thanks to
+
+- [Joshua Robinson][buildbreakdo]. Most of the code for css scoping i took from his [style-it][style-it] module.
+
+[buildbreakdo]: https://github.com/buildbreakdo/
+[style-it]: https://github.com/buildbreakdo/style-it
