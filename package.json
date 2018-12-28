@@ -1,7 +1,10 @@
 {
   "name": "react-simple-styling",
-  "version": "0.2.0",
-  "main": "./src/styling",
+  "version": "0.2.1",
+  "main": "./dist/index.js",
+  "files": [
+    "./dist"
+  ],
   "repository": {
     "url": "https://github.com/MurkyMeow/react-simple-styling"
   },
