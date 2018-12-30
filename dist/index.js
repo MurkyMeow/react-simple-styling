@@ -2399,7 +2399,13 @@ var _nonSecure = _interopRequireDefault(require("nanoid/non-secure"));
 
 var _scope = require("./scope");
 
+var _react = require("react");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 /**
  * Adds scoping to specified css and inserts it into the DOM with <style> tag
@@ -2417,21 +2423,26 @@ var css = function css(styleString) {
     return (0, _scope.scopeElement)(scope, element);
   };
 };
+/** Wraps a React component to allow it consume className from props automatically */
+
 
 exports.css = css;
 
-/** Wraps a React component to allow it consume className from props automatically */
 var styleable = function styleable(component) {
   return function (props) {
-    //doesn't work for some reason =d
-    //const element = createElement(component, props);
+    //const element = createElement(component, props); props aren't passed for some reason =d
     var element = component(props);
-    return (0, _scope.scopeElement)(props.className, element);
+    var className = [element.props.className, props.className].filter(function (x) {
+      return !!x;
+    }).join(' ');
+    return (0, _react.cloneElement)(element, _objectSpread({}, element.props, {
+      className: className
+    }));
   };
 };
 
 exports.styleable = styleable;
-},{"nanoid/non-secure":"../node_modules/nanoid/non-secure/index.js","./scope":"scope.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"nanoid/non-secure":"../node_modules/nanoid/non-secure/index.js","./scope":"scope.js","react":"../node_modules/react/index.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2458,7 +2469,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57585" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59349" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

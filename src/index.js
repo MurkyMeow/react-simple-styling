@@ -1,5 +1,6 @@
 import nanoid from 'nanoid/non-secure';
 import { scopeCSS, scopeElement } from './scope';
+import { cloneElement } from 'react';
 
 /**
  * Adds scoping to specified css and inserts it into the DOM with <style> tag
@@ -20,9 +21,8 @@ export const css = styleString => {
 
 /** Wraps a React component to allow it consume className from props automatically */
 export const styleable = component => props => {
-  //doesn't work for some reason =d
-  //const element = createElement(component, props);
-
+  //const element = createElement(component, props); props aren't passed for some reason =d
   const element = component(props);
-  return scopeElement(props.className, element);
+  const className = [element.props.className, props.className].filter(x => !!x).join(' ');
+  return cloneElement(element, { ...element.props, className });
 };
