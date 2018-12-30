@@ -29,7 +29,7 @@ const style = css`
     margin: 0 auto;
     color: red;
   }
-;`
+`;
 ```
 
 and apply the css with it
@@ -78,57 +78,6 @@ will be transformed into this:
     Hello world!
   </div>
 </div>
-```
-
-## :host
-
-To style your component's root element you can use **:host** pseudo class just like in Shadow DOM:
-
-```js
-const style = css`
-  :host {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-  }
-`;
-
-const BottomNavigation = ()=> style(
-  <Flex justify="around"> {/*<-- style is applied to this element*/}
-    <LinkButton to="/calendar"/>
-    <LinkButton to="/explore"/>
-    <LinkButton to="/notifications"/>
-    <LinkButton to="/profile"/>
-  </Flex>
-);
-```
-
-## What about Fragment?
-
-The elements of a fragment doesn't have parent so scope is applied to all of them:
-
-```js
-const style = css`
-  .test {
-    color: red;
-  }
-`;
-
-const Foo = ()=> style(
-  <>
-    <p className="test">bar</p>
-    <p>baz</p>
-    <>
-      <p>qux</p>
-    </>
-  </>
-);
-
-//<Foo/> will be rendered as shown below
-
-<p class="svg6oqh test">bar</p>
-<p class="svg6oqh">baz</p>
-<p class="svg6oqh">qux</p>
 ```
 
 ## CSS syntax highlighting

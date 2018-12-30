@@ -1,93 +1,44 @@
-import { isFragment } from './util';
 import { Children, cloneElement } from 'react';
-import cx from 'classnames';
 import escapeTextContentForBrowser from './escape';
 
-export const scopeSelector = (scopeClassName, selector, rootSelectors) => {
-  //every :host selector is replaced with scopeClassName
-  //to provide simple way to style root element of a component
-  /* if(selector.includes(':host'))
-    return scopeClassName; */
-  //selector = selector.replace(/:host/g, scopeClassName);
+const reservedNames = ['body']
 
-  let scopedSelector = [];
-
+export const scopeSelectors = (scope, selectors) => {
   // Matches comma-delimiters in multi-selectors (".fooClass, .barClass {...}" => "," );
   // ignores commas-delimiters inside of brackets and parenthesis ([attr=value], :not()..)
   const groupOfSelectorsPattern = /,(?![^(|[]*\)|\])/g;
 
-  const selectors = selector.split(groupOfSelectorsPattern);
-
-  selectors.forEach(selector => {
-    let containsSelector; // .scope .someClass
-    let unionSelector; // .scope.someClass (account for root)
-
-    //no need to scope :host, just replace it with scopeClassName
-    //it allows :host to reference the root node of a componenet
-    if (selector.trim() == ':host') {
-      scopedSelector.push(scopeClassName);
-    }
-    else if (rootSelectors.length && rootSelectors.some(rootSelector => selector.match(rootSelector))) {
-      unionSelector = selector;
-
-      // Can't just add them together because of selector combinator complexity
-      // like '.rootClassName.someClass.otherClass > *' or :not('.rootClassName'),
-      // replace must be used
-
-      // Escape valid CSS special characters that are also RegExp special characters
-      const escapedRootSelectors = rootSelectors.map(rootSelector => (
-        rootSelector.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')
-      ));
-
-      unionSelector = unionSelector.replace(new RegExp(
-        '(' +                             // Start capture group
-        escapedRootSelectors.join('|') +  // Match any one root selector
-        ')'                               // End capture group
-      ),
-        '$1' + scopeClassName              // Replace any one root selector match with a union
-      );                                   // of the root selector and scoping class (e.g., .rootSelector._scoped-1). Order matters here because of type-class union support like div._scoped-1
-
-      // Do both union and contains selectors because of case <div><div></div></div>
-      // or <div className="foo"><div className="foo"></div></div>
-      containsSelector = scopeClassName + ' ' + selector;
-      scopedSelector.push(unionSelector, containsSelector);
-    } else {
-      containsSelector = scopeClassName + ' ' + selector;
-      scopedSelector.push(containsSelector);
-    }
-  });
+  const scopedSelector = selectors
+    .split(groupOfSelectorsPattern) //.foo, .bar => ['.foo', '.bar']
+    .map(selector => {
+      selector = selector.trim();
+      //no need to scope selectors like body
+      if (reservedNames.includes(selector))
+        return selector;
+      //.selector => .selector[scope="gHLaE8d"]
+      return `${selector}[scope="${scope}"]`;
+    });
 
   return scopedSelector.join(', ');
 };
 
 /**
- * Passes the className to the current element
- * or to all of it's children in case we have a fragment
- * @param {string} scope - className to pass to the element
+ * @param {string} scope - scope attribute value to pass to the element and its children
  * @returns {React.ReactElement} element with the scope applied
  * @example
- * scopeElement('foo', <div></div>)
- * //=> <div className="foo"></div>
- * @example
- * scopeElement('foo', <>
- *  <div></div>
- *  <div></div>
- *  <div></div>
- * </>)
- * //=>
- * //<div className="foo"></div>
- * //<div className="foo"></div>
- * //<div className="foo"></div>
+ *    scopeElement('foo', <div><div></div></div>)
+ *    //<div scope="foo">
+ *    //  <div scope="foo"></div>
+ *    //</div>
  */
 export const scopeElement = (scope, element) => {
+  if(typeof element == 'string')
+    return element;
+
   let children = element.props.children;
-  const className = cx(element.props.className, scope);
+  children = Children.map(children, child => scopeElement(scope, child));
 
-  if (isFragment(element)) {
-    children = Children.map(children, child => scopeElement(scope, child));
-  }
-
-  return cloneElement(element, {...element.props, className}, children);
+  return cloneElement(element, { ...element.props, scope }, children);
 };
 
 /**
@@ -97,7 +48,7 @@ export const scopeElement = (scope, element) => {
   *    ".scoped-1234.foo { color: red; } .scoped-1234 .bar { color: green; }"
   * @return {!string} Scoped style rule string
 */
-export const scopeCSS = (styleString, scopeClassName, rootSelectors) => {
+export const scopeCSS = (styleString, scopeClassName) => {
   const isDeclarationBodyPattern = /.*:.*;/g;
   const isLastItemDeclarationBodyPattern = /.*:.*(;|$)/g;
   const isAtRulePattern = /\s*@/g;
@@ -132,7 +83,7 @@ export const scopeCSS = (styleString, scopeClassName, rootSelectors) => {
           if (scopeClassName && !/:target/gi.test(selector)) {
             // Prefix the scope to the selector if it is not an at-rule
             if (!selector.match(isAtRulePattern) && !selector.match(isKeyframeOffsetPattern)) {
-              return scopeSelector(scopeClassName, selector, rootSelectors);
+              return scopeSelectors(scopeClassName, selector);
             } else {
               // Is at-rule or keyframe offset and should not be scoped
               return selector;
