@@ -1,12 +1,11 @@
 {
   "name": "react-simple-styling",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "main": "./dist/index.js",
   "repository": {
     "url": "https://github.com/MurkyMeow/react-simple-styling"
   },
   "dependencies": {
-    "classnames": "^2.2.6",
     "nanoid": "^2.0.0",
     "react": "^16.7.0"
   },
