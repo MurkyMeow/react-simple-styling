@@ -38,6 +38,11 @@ export const scopeElement = (scope, element) => {
   let children = element.props.children;
   children = Children.map(children, child => scopeElement(scope, child));
 
+  //fix for Children.only throwing an error when the argument is an array
+  //even if it only contains 1 element
+  if(children.length == 1)
+    children = children[0];
+
   return cloneElement(element, { ...element.props, scope }, children);
 };
 
