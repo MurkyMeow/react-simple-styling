@@ -47,7 +47,7 @@ export const scopeSelectors = (scope, selectors) => {
  *    //</div>
  */
 export const scopeElement = (scope, element) => {
-  if(typeof element == 'string')
+  if(typeof element !== 'object') //avoid scoping text or numeric nodes
     return element;
 
   let children = element.props.children;

@@ -1,6 +1,6 @@
 {
   "name": "react-simple-styling",
-  "version": "0.2.9-b",
+  "version": "0.3.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {

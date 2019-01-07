@@ -2291,6 +2291,8 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var reservedNames = ['body'];
 /**
  * 
@@ -2332,7 +2334,8 @@ var scopeSelectors = function scopeSelectors(scope, selectors) {
 exports.scopeSelectors = scopeSelectors;
 
 var scopeElement = function scopeElement(scope, element) {
-  if (typeof element == 'string') return element;
+  if (_typeof(element) !== 'object') //avoid scoping text or numeric nodes
+    return element;
   var children = element.props.children;
 
   if (children) {
@@ -2488,7 +2491,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59309" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60689" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
