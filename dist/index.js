@@ -2292,6 +2292,13 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var reservedNames = ['body'];
+/**
+ * 
+ * @param {string} scope 
+ * @param {Array<string>} selectors 
+ * scopes all the selectors this way:
+ * //.selector => .selector[scope="${scope}"]
+ */
 
 var scopeSelectors = function scopeSelectors(scope, selectors) {
   // Matches comma-delimiters in multi-selectors (".fooClass, .barClass {...}" => "," );
@@ -2301,14 +2308,18 @@ var scopeSelectors = function scopeSelectors(scope, selectors) {
   .map(function (selector) {
     selector = selector.trim(); //no need to scope selectors like body
 
-    if (reservedNames.includes(selector)) return selector; //.selector => .selector[scope="gHLaE8d"]
+    if (reservedNames.includes(selector)) return selector; //.selector::before should be scoped like this
+    //.selector[scope="gHLaE8d"]::before
+    //and not this
+    //.selector::before[scope="gHLaE8d"]
 
+    if (selector.includes(':')) return selector.replace(/:+/, "[scope=\"".concat(scope, "\"]:"));
     return "".concat(selector, "[scope=\"").concat(scope, "\"]");
   });
   return scopedSelector.join(', ');
 };
 /**
- * @param {string} scope - scope attribute value to pass to the element and its children
+ * @param {string} scope - scope attribute to pass to the element and its children
  * @returns {React.ReactElement} element with the scope applied
  * @example
  *    scopeElement('foo', <div><div></div></div>)
@@ -2323,9 +2334,16 @@ exports.scopeSelectors = scopeSelectors;
 var scopeElement = function scopeElement(scope, element) {
   if (typeof element == 'string') return element;
   var children = element.props.children;
-  children = _react.Children.map(children, function (child) {
-    return scopeElement(scope, child);
-  });
+
+  if (children) {
+    children = _react.Children.map(children, function (child) {
+      return scopeElement(scope, child);
+    }); //fix for Children.only throwing an error when the argument is an array
+    //even if it only contains 1 element
+
+    if (children.length == 1) children = children[0];
+  }
+
   return (0, _react.cloneElement)(element, _objectSpread({}, element.props, {
     scope: scope
   }), children);
@@ -2431,10 +2449,11 @@ exports.css = css;
 var styleable = function styleable(component) {
   return function (props) {
     //const element = createElement(component, props); props aren't passed for some reason =d
-    var element = component(props);
+    var element = component(props); //concatenate classes and filter out falsy values
+
     var className = [element.props.className, props.className].filter(function (x) {
-      return !!x;
-    }).join(' ');
+      return x;
+    }).join(' ') || null;
     return (0, _react.cloneElement)(element, _objectSpread({}, element.props, {
       className: className
     }));
@@ -2469,7 +2488,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59349" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59309" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

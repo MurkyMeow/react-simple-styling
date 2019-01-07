@@ -23,6 +23,12 @@ export const css = styleString => {
 export const styleable = component => props => {
   //const element = createElement(component, props); props aren't passed for some reason =d
   const element = component(props);
-  const className = [element.props.className, props.className].filter(x => !!x).join(' ');
+
+  //concatenate classes and filter out falsy values
+  const className = [
+    element.props.className,
+    props.className
+  ].filter(x => x).join(' ') || null;
+
   return cloneElement(element, { ...element.props, className });
 };

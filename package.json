@@ -1,7 +1,12 @@
 {
   "name": "react-simple-styling",
-  "version": "0.2.9",
+  "version": "0.2.9-b",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "parcel src/index.js",
+    "ts": "tsc -d src/index.ts"
+  },
   "repository": {
     "url": "https://github.com/MurkyMeow/react-simple-styling"
   },
@@ -16,5 +21,8 @@
     "scoped",
     "css",
     "className"
-  ]
+  ],
+  "devDependencies": {
+    "typescript": "^3.2.2"
+  }
 }

@@ -2,6 +2,8 @@
 
 Simple Vue-like library to create scoped styles for your React components!
 
+[![NPM](https://nodei.co/npm/react-simple-styling.png)](https://npmjs.org/package/react-simple-styling)
+
 ## Installation
 
 ```sh

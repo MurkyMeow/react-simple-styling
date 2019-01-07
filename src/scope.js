@@ -1,8 +1,15 @@
 import { Children, cloneElement } from 'react';
 import escapeTextContentForBrowser from './escape';
 
-const reservedNames = ['body']
+const reservedNames = ['body'];
 
+/**
+ * 
+ * @param {string} scope 
+ * @param {Array<string>} selectors 
+ * scopes all the selectors this way:
+ * //.selector => .selector[scope="${scope}"]
+ */
 export const scopeSelectors = (scope, selectors) => {
   // Matches comma-delimiters in multi-selectors (".fooClass, .barClass {...}" => "," );
   // ignores commas-delimiters inside of brackets and parenthesis ([attr=value], :not()..)
@@ -12,10 +19,18 @@ export const scopeSelectors = (scope, selectors) => {
     .split(groupOfSelectorsPattern) //.foo, .bar => ['.foo', '.bar']
     .map(selector => {
       selector = selector.trim();
+
       //no need to scope selectors like body
       if (reservedNames.includes(selector))
         return selector;
-      //.selector => .selector[scope="gHLaE8d"]
+      
+      //.selector::before should be scoped like this
+      //.selector[scope="gHLaE8d"]::before
+      //and not this
+      //.selector::before[scope="gHLaE8d"]
+      if(selector.includes(':'))
+        return selector.replace(/:+/, `[scope="${scope}"]:`);
+
       return `${selector}[scope="${scope}"]`;
     });
 
@@ -23,7 +38,7 @@ export const scopeSelectors = (scope, selectors) => {
 };
 
 /**
- * @param {string} scope - scope attribute value to pass to the element and its children
+ * @param {string} scope - scope attribute to pass to the element and its children
  * @returns {React.ReactElement} element with the scope applied
  * @example
  *    scopeElement('foo', <div><div></div></div>)
@@ -36,12 +51,14 @@ export const scopeElement = (scope, element) => {
     return element;
 
   let children = element.props.children;
-  children = Children.map(children, child => scopeElement(scope, child));
-
-  //fix for Children.only throwing an error when the argument is an array
-  //even if it only contains 1 element
-  if(children.length == 1)
-    children = children[0];
+  if(children) {
+    children = Children.map(children, child => scopeElement(scope, child));
+    
+    //fix for Children.only throwing an error when the argument is an array
+    //even if it only contains 1 element
+    if(children.length == 1)
+      children = children[0];
+  }
 
   return cloneElement(element, { ...element.props, scope }, children);
 };
