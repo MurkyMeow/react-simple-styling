@@ -82,15 +82,24 @@ will be transformed into this:
 </div>
 ```
 
+## Theming
+
+Now the library supports string interpolation. You can use it to manage themes easily.
+
+```js
+const style = css`
+  .border {
+    border: 1px solid ${theme.accent}
+  }
+`;
+
+```
+
 ## CSS syntax highlighting
 
-Don't worry about coding experience when using string literals. With some magic of extensions you can bring CSS syntax highlighting and popus into your js.
+To bring syntax highlighting and autocomplete checkout the extenstions for [styled-jsx][styledjsx] which work with my module as well.
 
-For VSCode i prefer this ones:
-
-https://marketplace.visualstudio.com/items?itemName=AndrewRazumovsky.vscode-styled-jsx-languageserver
-
-https://marketplace.visualstudio.com/items?itemName=blanu.vscode-styled-jsx
+https://github.com/zeit/styled-jsx#syntax-highlighting
 
 ![](https://i.imgur.com/2Cmow8E.png)
 
@@ -100,3 +109,4 @@ https://marketplace.visualstudio.com/items?itemName=blanu.vscode-styled-jsx
 
 [buildbreakdo]: https://github.com/buildbreakdo/
 [style-it]: https://github.com/buildbreakdo/style-it
+[styledjsx]: https://github.com/zeit/styled-jsx

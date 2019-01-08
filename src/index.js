@@ -1,14 +1,17 @@
 import nanoid from 'nanoid/non-secure';
 import { scopeCSS, scopeElement } from './scope';
 import { cloneElement } from 'react';
+import { tagToString } from './util';
 
 /**
+ * @param {string} style - CSS string
  * Adds scoping to specified css and inserts it into the DOM with <style> tag
  * @returns {Function} - wrapper for React.Element that applies styling to it
 */
-export const css = styleString => {
-  //fix for tag strings that return an array =d
-  styleString = styleString.toString();
+export const css = (style, ...values) => {
+  const styleString = tagToString(style, values);
+
+  console.log(styleString);
 
   const scope = nanoid(7);
   const styleNode = document.createElement('style');

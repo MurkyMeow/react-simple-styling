@@ -2334,8 +2334,8 @@ var scopeSelectors = function scopeSelectors(scope, selectors) {
 exports.scopeSelectors = scopeSelectors;
 
 var scopeElement = function scopeElement(scope, element) {
-  if (_typeof(element) !== 'object') //avoid scoping text or numeric nodes
-    return element;
+  //avoid scoping text, numeric or void nodes
+  if (_typeof(element) !== 'object' || element === null) return element;
   var children = element.props.children;
 
   if (children) {
@@ -2408,7 +2408,31 @@ var scopeCSS = function scopeCSS(styleString, scopeClassName) {
 };
 
 exports.scopeCSS = scopeCSS;
-},{"react":"../node_modules/react/index.js","./escape":"escape.js"}],"index.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","./escape":"escape.js"}],"util.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.tagToString = exports.isFragment = void 0;
+
+/** Checks if an element is React.Fragment */
+var isFragment = function isFragment(element) {
+  return 'Symbol(react.fragment)' == element.type.toString();
+};
+/** concatenates tag string temlpates with corresponding values */
+
+
+exports.isFragment = isFragment;
+
+var tagToString = function tagToString(templates, values) {
+  return templates.map(function (template, i) {
+    return template + (values[i] || '');
+  }).join('');
+};
+
+exports.tagToString = tagToString;
+},{}],"index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2422,6 +2446,8 @@ var _scope = require("./scope");
 
 var _react = require("react");
 
+var _util = require("./util");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
@@ -2429,12 +2455,17 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 /**
+ * @param {string} style - CSS string
  * Adds scoping to specified css and inserts it into the DOM with <style> tag
  * @returns {Function} - wrapper for React.Element that applies styling to it
 */
-var css = function css(styleString) {
-  //fix for tag strings that return an array =d
-  styleString = styleString.toString();
+var css = function css(style) {
+  for (var _len = arguments.length, values = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    values[_key - 1] = arguments[_key];
+  }
+
+  var styleString = (0, _util.tagToString)(style, values);
+  console.log(styleString);
   var scope = (0, _nonSecure.default)(7);
   var styleNode = document.createElement('style');
   styleNode.id = scope;
@@ -2464,7 +2495,7 @@ var styleable = function styleable(component) {
 };
 
 exports.styleable = styleable;
-},{"nanoid/non-secure":"../node_modules/nanoid/non-secure/index.js","./scope":"scope.js","react":"../node_modules/react/index.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"nanoid/non-secure":"../node_modules/nanoid/non-secure/index.js","./scope":"scope.js","react":"../node_modules/react/index.js","./util":"util.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2491,7 +2522,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60689" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64240" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
