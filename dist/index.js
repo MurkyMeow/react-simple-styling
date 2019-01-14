@@ -104,36 +104,32 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   // Override the current require with this new one
   return newRequire;
-})({"../node_modules/nanoid/non-secure/index.js":[function(require,module,exports) {
-var url = 'bjectSymhasOwnProp-0123456789ABCDEFGHIJKLMNQRTUVWXYZ_dfgiklquvxz'
-
-/**
- * Generate URL-friendly unique ID. This method use non-secure predictable
- * random generator.
- *
- * By default, ID will have 21 symbols to have a collision probability similar
- * to UUID v4.
- *
- * @param {number} [size=21] The number of symbols in ID.
- *
- * @return {string} Random string.
- *
- * @example
- * const nanoid = require('nanoid/non-secure')
- * model.id = nanoid() //=> "Uakgb_J5m9g-0JDMbcJqL"
- *
- * @name nonSecure
- * @function
- */
-module.exports = function (size) {
-  size = size || 21
-  var id = ''
-  while (0 < size--) {
-    id += url[Math.random() * 64 | 0]
+})({"../node_modules/nanoid/index.browser.js":[function(require,module,exports) {
+if ("development" !== 'production') {
+  if (typeof self === 'undefined' || !self.crypto && !self.msCrypto) {
+    throw new Error('Your browser does not have secure random generator. ' + 'If you don’t need unpredictable IDs, you can use nanoid/non-secure.');
   }
-  return id
 }
 
+var crypto = self.crypto || self.msCrypto;
+/*
+ * This alphabet uses a-z A-Z 0-9 _- symbols.
+ * Symbols order was changed for better gzip compression.
+ */
+
+var url = 'Uint8ArdomValuesObj012345679BCDEFGHIJKLMNPQRSTWXYZ_cfghkpqvwxyz-';
+
+module.exports = function (size) {
+  size = size || 21;
+  var id = '';
+  var bytes = crypto.getRandomValues(new Uint8Array(size));
+
+  while (0 < size--) {
+    id += url[bytes[size] & 63];
+  }
+
+  return id;
+};
 },{}],"../node_modules/object-assign/index.js":[function(require,module,exports) {
 /*
 object-assign
@@ -2241,39 +2237,7 @@ if ("development" === 'production') {
 } else {
   module.exports = require('./cjs/react.development.js');
 }
-},{"./cjs/react.development.js":"../node_modules/react/cjs/react.development.js"}],"escape.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = exports.escaper = void 0;
-
-/** Escaper used in escapeTextContentForBrowser */
-var escaper = function escaper(match) {
-  var ESCAPE_LOOKUP = {
-    '>': '&gt;',
-    '<': '&lt;'
-  };
-  return ESCAPE_LOOKUP[match];
-};
-/**
- * Escapes text to prevent scripting attacks.
- * @param {*} text Text value to escape.
- * @return {string} An escaped string.
- */
-
-
-exports.escaper = escaper;
-
-var escapeTextContentForBrowser = function escapeTextContentForBrowser(text) {
-  var ESCAPE_REGEX = /[><]/g;
-  return ('' + text).replace(ESCAPE_REGEX, escaper);
-};
-
-var _default = escapeTextContentForBrowser;
-exports.default = _default;
-},{}],"scope.js":[function(require,module,exports) {
+},{"./cjs/react.development.js":"../node_modules/react/cjs/react.development.js"}],"scope.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2283,39 +2247,26 @@ exports.scopeCSS = exports.scopeElement = exports.scopeSelectors = void 0;
 
 var _react = require("react");
 
-var _escape = _interopRequireDefault(require("./escape"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-var reservedNames = ['body'];
 /**
- * 
  * @param {string} scope 
  * @param {Array<string>} selectors 
  * scopes all the selectors this way:
  * //.selector => .selector[scope="${scope}"]
  */
-
 var scopeSelectors = function scopeSelectors(scope, selectors) {
   // Matches comma-delimiters in multi-selectors (".fooClass, .barClass {...}" => "," );
   // ignores commas-delimiters inside of brackets and parenthesis ([attr=value], :not()..)
   var groupOfSelectorsPattern = /,(?![^(|[]*\)|\])/g;
   var scopedSelector = selectors.split(groupOfSelectorsPattern) //.foo, .bar => ['.foo', '.bar']
   .map(function (selector) {
-    selector = selector.trim(); //no need to scope selectors like body
-
-    if (reservedNames.includes(selector)) return selector; //.selector::before should be scoped like this
-    //.selector[scope="gHLaE8d"]::before
-    //and not this
-    //.selector::before[scope="gHLaE8d"]
-
-    if (selector.includes(':')) return selector.replace(/:+/, "[scope=\"".concat(scope, "\"]:"));
+    //scope have to go before pseudo class if there's one
+    if (selector.includes(':')) return selector.replace(/:+/, "[scope=\"".concat(scope, "\"]$&"));
     return "".concat(selector, "[scope=\"").concat(scope, "\"]");
   });
   return scopedSelector.join(', ');
@@ -2334,8 +2285,8 @@ var scopeSelectors = function scopeSelectors(scope, selectors) {
 exports.scopeSelectors = scopeSelectors;
 
 var scopeElement = function scopeElement(scope, element) {
-  //avoid scoping text, numeric or void nodes
-  if (_typeof(element) !== 'object' || element === null) return element;
+  //avoid scoping non-object (e.g. text) or void nodes
+  if (_typeof(element) !== 'object' || !element) return element;
   var children = element.props.children;
 
   if (children) {
@@ -2351,14 +2302,6 @@ var scopeElement = function scopeElement(scope, element) {
     scope: scope
   }), children);
 };
-/**
-  * Scopes CSS statement with a given scoping class name as a union or contains selector;
-  * also escapes CSS declaration bodies
-  *    > proccessStyleString( '.foo { color: red; } .bar { color: green; }', '_scoped-1234, ['.root', '.foo']  )
-  *    ".scoped-1234.foo { color: red; } .scoped-1234 .bar { color: green; }"
-  * @return {!string} Scoped style rule string
-*/
-
 
 exports.scopeElement = scopeElement;
 
@@ -2373,42 +2316,24 @@ var scopeCSS = function scopeCSS(styleString, scopeClassName) {
   .map(function (fragment) {
     // Split fragment into selector and declarationBody; escape declaration body
     return fragment.split('{').map(function (statement, i, arr) {
-      // Avoid processing whitespace
-      if (!statement.trim().length) {
-        return '';
-      }
+      statement = statement.trim(); // Avoid processing whitespace
 
+      if (!statement.length) return '';
       var isDeclarationBodyItemWithOptionalSemicolon = // Only for the last property-value in a
       // CSS declaration body is a semicolon optional
-      arr.length - 1 === i && statement.match(isLastItemDeclarationBodyPattern); // Skip escaping selectors statements since that would break them;
-      // note in docs that selector statements are not escaped and should
-      // not be generated from user provided strings
+      arr.length - 1 === i && statement.match(isLastItemDeclarationBodyPattern); //declaration bodies and at-rules shouldn't be scoped
 
-      if (statement.match(isDeclarationBodyPattern) || isDeclarationBodyItemWithOptionalSemicolon) {
-        return (0, _escape.default)(statement);
-      } else {
-        // Statement is a selector
-        var selector = statement;
-
-        if (scopeClassName && !/:target/gi.test(selector)) {
-          // Prefix the scope to the selector if it is not an at-rule
-          if (!selector.match(isAtRulePattern) && !selector.match(isKeyframeOffsetPattern)) {
-            return scopeSelectors(scopeClassName, selector);
-          } else {
-            // Is at-rule or keyframe offset and should not be scoped
-            return selector;
-          }
-        } else {
-          // No scope; do nothing to the selector
-          return selector;
-        }
+      if (isDeclarationBodyItemWithOptionalSemicolon || statement.match(isDeclarationBodyPattern) || statement.match(isKeyframeOffsetPattern) || statement.match(isAtRulePattern)) {
+        return statement;
       }
+
+      return scopeSelectors(scopeClassName, statement);
     }).join('{\n');
   }).join('}\n');
 };
 
 exports.scopeCSS = scopeCSS;
-},{"react":"../node_modules/react/index.js","./escape":"escape.js"}],"util.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js"}],"util.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2440,7 +2365,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.styleable = exports.css = void 0;
 
-var _nonSecure = _interopRequireDefault(require("nanoid/non-secure"));
+var _nanoid = _interopRequireDefault(require("nanoid"));
 
 var _scope = require("./scope");
 
@@ -2466,7 +2391,7 @@ var css = function css(style) {
 
   var styleString = (0, _util.tagToString)(style, values);
   console.log(styleString);
-  var scope = (0, _nonSecure.default)(7);
+  var scope = (0, _nanoid.default)(7);
   var styleNode = document.createElement('style');
   styleNode.id = scope;
   styleNode.innerHTML = (0, _scope.scopeCSS)(styleString, scope);
@@ -2495,7 +2420,7 @@ var styleable = function styleable(component) {
 };
 
 exports.styleable = styleable;
-},{"nanoid/non-secure":"../node_modules/nanoid/non-secure/index.js","./scope":"scope.js","react":"../node_modules/react/index.js","./util":"util.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"nanoid":"../node_modules/nanoid/index.browser.js","./scope":"scope.js","react":"../node_modules/react/index.js","./util":"util.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2522,7 +2447,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64240" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55361" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

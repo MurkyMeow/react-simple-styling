@@ -1,10 +1,6 @@
 import { Children, cloneElement } from 'react';
-import escapeTextContentForBrowser from './escape';
-
-const reservedNames = ['body'];
 
 /**
- * 
  * @param {string} scope 
  * @param {Array<string>} selectors 
  * scopes all the selectors this way:
@@ -18,19 +14,10 @@ export const scopeSelectors = (scope, selectors) => {
   const scopedSelector = selectors
     .split(groupOfSelectorsPattern) //.foo, .bar => ['.foo', '.bar']
     .map(selector => {
-      selector = selector.trim();
-
-      //no need to scope selectors like body
-      if (reservedNames.includes(selector))
-        return selector;
-      
-      //.selector::before should be scoped like this
-      //.selector[scope="gHLaE8d"]::before
-      //and not this
-      //.selector::before[scope="gHLaE8d"]
+      //scope have to go before pseudo class if there's one
       if(selector.includes(':'))
-        return selector.replace(/:+/, `[scope="${scope}"]:`);
-
+        return selector.replace(/:+/, `[scope="${scope}"]$&`);
+        
       return `${selector}[scope="${scope}"]`;
     });
 
@@ -47,14 +34,13 @@ export const scopeSelectors = (scope, selectors) => {
  *    //</div>
  */
 export const scopeElement = (scope, element) => {
-  //avoid scoping text, numeric or void nodes
-  if(typeof element !== 'object' || element === null)
+  //avoid scoping non-object (e.g. text) or void nodes
+  if(typeof element !== 'object' || !element)
     return element;
 
   let children = element.props.children;
   if(children) {
     children = Children.map(children, child => scopeElement(scope, child));
-    
     //fix for Children.only throwing an error when the argument is an array
     //even if it only contains 1 element
     if(children.length == 1)
@@ -64,13 +50,6 @@ export const scopeElement = (scope, element) => {
   return cloneElement(element, { ...element.props, scope }, children);
 };
 
-/**
-  * Scopes CSS statement with a given scoping class name as a union or contains selector;
-  * also escapes CSS declaration bodies
-  *    > proccessStyleString( '.foo { color: red; } .bar { color: green; }', '_scoped-1234, ['.root', '.foo']  )
-  *    ".scoped-1234.foo { color: red; } .scoped-1234 .bar { color: green; }"
-  * @return {!string} Scoped style rule string
-*/
 export const scopeCSS = (styleString, scopeClassName) => {
   const isDeclarationBodyPattern = /.*:.*;/g;
   const isLastItemDeclarationBodyPattern = /.*:.*(;|$)/g;
@@ -84,10 +63,10 @@ export const scopeCSS = (styleString, scopeClassName) => {
     .map((fragment) => {
       // Split fragment into selector and declarationBody; escape declaration body
       return fragment.split('{').map((statement, i, arr) => {
+        statement = statement.trim();
         // Avoid processing whitespace
-        if (!statement.trim().length) {
+        if (!statement.length)
           return '';
-        }
 
         const isDeclarationBodyItemWithOptionalSemicolon = (
           // Only for the last property-value in a
@@ -95,27 +74,16 @@ export const scopeCSS = (styleString, scopeClassName) => {
           (arr.length - 1) === i &&
           statement.match(isLastItemDeclarationBodyPattern)
         );
-        // Skip escaping selectors statements since that would break them;
-        // note in docs that selector statements are not escaped and should
-        // not be generated from user provided strings
-        if (statement.match(isDeclarationBodyPattern) || isDeclarationBodyItemWithOptionalSemicolon) {
-          return escapeTextContentForBrowser(statement);
-        } else { // Statement is a selector
-          const selector = statement;
-
-          if (scopeClassName && !/:target/gi.test(selector)) {
-            // Prefix the scope to the selector if it is not an at-rule
-            if (!selector.match(isAtRulePattern) && !selector.match(isKeyframeOffsetPattern)) {
-              return scopeSelectors(scopeClassName, selector);
-            } else {
-              // Is at-rule or keyframe offset and should not be scoped
-              return selector;
-            }
-          } else {
-            // No scope; do nothing to the selector
-            return selector;
-          }
+        //declaration bodies and at-rules shouldn't be scoped
+        if (
+          isDeclarationBodyItemWithOptionalSemicolon ||
+          statement.match(isDeclarationBodyPattern) ||
+          statement.match(isKeyframeOffsetPattern) ||
+          statement.match(isAtRulePattern)
+        ) {
+          return statement;
         }
+        return scopeSelectors(scopeClassName, statement);
       }).join('{\n')
     }).join('}\n');
 };

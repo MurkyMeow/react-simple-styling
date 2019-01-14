@@ -1,4 +1,4 @@
-import nanoid from 'nanoid/non-secure';
+import nanoid from 'nanoid';
 import { scopeCSS, scopeElement } from './scope';
 import { cloneElement } from 'react';
 import { tagToString } from './util';
