@@ -24,8 +24,10 @@ export const css = (style, ...values) => {
 
 /** Wraps a React component to allow it consume className from props automatically */
 export const styleable = component => props => {
-  //const element = createElement(component, props); props aren't passed for some reason =d
   const element = component(props);
+
+  if(!element || !element.props)
+    return null;
 
   //concatenate classes and filter out falsy values
   const className = [

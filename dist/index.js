@@ -2407,8 +2407,8 @@ exports.css = css;
 
 var styleable = function styleable(component) {
   return function (props) {
-    //const element = createElement(component, props); props aren't passed for some reason =d
-    var element = component(props); //concatenate classes and filter out falsy values
+    var element = component(props);
+    if (!element || !element.props) return null; //concatenate classes and filter out falsy values
 
     var className = [element.props.className, props.className].filter(function (x) {
       return x;
@@ -2447,7 +2447,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55361" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50850" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
